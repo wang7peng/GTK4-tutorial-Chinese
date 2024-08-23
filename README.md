@@ -48,8 +48,8 @@
 12. 信号
 13. TfeTextView 中的函数
 14. GtkNotebook 中的函数
-15. tfeapplication.c
-16. tfe5 源文件
+15. [Tfe 主程序](src/sec15.md)
+16. [如何构建 tfe](src/sec16.md) (文本文件编辑器)
 17. 菜单和行为
 18. 状态行为
 19. 菜单和行为的 UI 文件
