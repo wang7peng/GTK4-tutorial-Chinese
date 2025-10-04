@@ -1,91 +1,63 @@
 主页：[教程介绍](../README.md)，上一节：[第01节](sec01.md)，下一节：[第03节](sec03.md)
 
-# 2 在 Linux 上安装 Gtk4
+# 2 准备工作 
+
+## 在 Linux 上安装 Gtk4
 
 本节教程描述如何在 Linux 发行版上安装 Gtk4。
 
-有三种方式安装 Gtk4：
+有两种方式安装 Gtk4：
 
 - 使用 Linux 自带的包管理系统安装，例如 apt
 - 从源文件编译安装
-- 使用 gnome-boxes 安装 Gnome 40
 
-## 使用包管理器安装
+### 使用包管理器安装
 
-这是最简单的安装方式，也是推荐的安装方式。我已经在 Ubuntu 21.04 上安装了 Gtk4。
+这是最简单的安装方式，我已经在 Ubuntu 24.04 长期支持版上成功安装了 Gtk4。
 
-输入如下命令进行安装：
+只需要输入命令就能安装：
+`$ sudo apt install libgtk-4-dev`
 
-```bash
-$ sudo apt-get install libgtk-4-bin libgtk-4-common libgtk-4-dev libgtk-4-doc
-```
+安装这个开发工具包（libgtk-4-dev）很重要，否则，你无法编译出任何基于 GTK4 运行的程序。
 
-Fedora, Arch, Debian 和 OpenSUSE 等也可以使用对应的包管理器进行安装，请参考 [Installing GTK from packages](https://www.gtk.org/docs/installations/linux#installing-gtk-from-packages)。
+Fedora、Debian、Arch、Gentoo 和 OpenSUSE 的 GTK4 开发包也可以通过对应的包管理器进行安装，请参考 [Installing GTK from packages](https://www.gtk.org/docs/installations/linux#installing-gtk-from-packages)。
 
-以下表格列出了本身就支持 Gtk4 的发行版：
+> 译者注：如果你已经通过此方法安装了 Gtk4，那么无需再阅读下面的内容。
 
-|   发行版    |           版本             |Gtk4 |    Gnome40    |
-|:----------:|:-------------------------:|:---:|:-------------:|
-|   Fedora   |            35             |4.4.2|    Gnome41    |
-|   Ubuntu   |           21.10           | 4.4 |Gnome40 (40.4.0)|
-|   Debian   |     bookworm(testing)     |4.6.2| Gnome40 (40.4) |
-|    Arch    |      rolling release      |4.6.3|    Gnome42    |
-|  OpenSUSE  |Tumbleweed(rolling release)|4.6.2|    Gnome42    |
+### 使用源码编译安装
 
-如果你已经通过此方法安装了 Gtk4，那么无需再阅读下面的内容。
+如果你想使用正在开发中的GTK版本，需要从源码开始构建它。详细步骤参阅官方在线文档《GTK4 API Reference》中的 [构建GTK库](https://docs.gtk.org/gtk4/building.html) 章节。
 
-## 使用源码编译安装
-
-如果你的操作系统没有预编译的 Gtk4 安装包，那么你可能需要编译源码来安装。另外如果想使用最新版的 Gtk4 也需编译源码安装。
-
-我在2021年1月使用源码安装了 Gtk4。因此，以下信息是旧信息，尤其是每个软件的版本可能与目前有些出入。有关最新信息，请参阅 [Gtk API Reference, Building GTK](https://docs.gtk.org/gtk4/building.html)。
+> 译者注：作者用源码安装了 Gtk4 还是在 2021 年。因此，以下信息尤其是每个软件的版本是旧信息。
 
 
-### Gtk4 安装的先决条件
-
-- Linux操作系统。例如，Ubuntu 20.10 或 20.04LTS。其他发行版可能也没问题。
-- gcc、meson、ninja、git、wget等开发包。
-- 以下每个软件都需要这些开发包。
-
-### 安装目标
-
-我在 `$HOME/local` 目录下安装了 Gtk4。这是一个私人用户区。
-
-如果要安装在系统区，`/opt/gtk4` 目录是不错的选择之一。[Gtk API Reference, Building GTK](https://docs.gtk.org/gtk4/building.html) 给出了在 `/opt/gtk4` 目录的安装示例。
+**1 安装位置**
+我在 `$HOME/local` 目录下安装了 Gtk4。这是一个私人用户区。如果要安装在系统区，官方文档给出的示例是在 `/opt/gtk4` 目录。
 
 不要将它安装到默认的 `/usr/local`。很多不是基于 Gtk4 构建的 Ubuntu 应用程序会使用此目录下系统自带的 Gtk 库。因此，安装在默认位置风险很高，很可能会发生不好的事情。
 
-### 安装到 Ubuntu 20.10
+> 大多数必需的库都包含在 Ubuntu 中，可以直接用 apt 命令安装它们，不需要从源码安装。您可以跳过下面有关依赖库安装（Glib、Pango、Gdk-pixbuf）的小节。
 
-大多数必需的库都包含在 Ubuntu 20.10 中。因此，可以使用 apt-get 命令来安装它们。您不需要从源码安装它们。您可以跳过下面有关依赖库安装（Glib、Pango、Gdk-pixbuf 和 Gtk-doc）的小节。
+**2 Glib 安装**
+用命令 `pkg-config --modversion glib-2.0` 检查系统中自带的的库的版本，Glib 必须是 2.66.0 以上的版本。如果它低于必要的版本（比如您的 Ubuntu 是20.04LTS 之前），请从源码安装。
 
-### Glib 安装
-
-如果您的 Ubuntu 是 20.04LTS，则需要从源码安装。请检查您的库的版本，如果它低于必要的版本，请从源码安装。
-
-例如，
+从源码安装 Glib。我安装了 2.86.0，这是当时（2025年10月）的最新版本。
 
 ```bash
-$ pkg-config --modversion glib-2.0
-2.64.6
+# 下载 Glib 源码
+$ wget https://download.gnome.org/sources/glib/2.86/glib-2.86.0.tar.xz
+
+# 解压并提取文件
+$ tar -Jxf glib-2.86.*
 ```
 
-必要的版本是 2.66.0 或更高版本。 因此，上面的示例表明您需要安装 Glib。我安装了 2.67.1，这是当时（2021年1月）的最新版本。下载 Glib 源文件，然后解压缩并提取文件:
+编译 Glib 可能需要额外的一些库
 
 ```bash
-$ wget https://download.gnome.org/sources/glib/2.67/glib-2.67.1.tar.xz
-$ tar -Jxf glib-2.67.1.tar.xz
-```
-
-编译 Glib 可能需要额外的一些库，你可以使用 meson 来找到它们：
-
-```bash
+# 用 meson 来找到它们
 $ meson --prefix $HOME/local _build
-```
 
-使用 apt-get 来安装这些依赖：
-
-```bash
+# 使用 apt-get 来安装这些依赖：
 $ sudo apt-get install -y  libpcre2-dev libffi-dev
 ```
 
@@ -117,23 +89,18 @@ export GSETTINGS_SCHEMA_DIR=$HOME/local/share/glib-2.0/schemas
 然后使用 . (dot) 或者 source 命令将这些环境变量导入到当前的bash：
 
 ```bash
-$ . env.sh
+$ . env.sh        # 方式1
+$ source env.sh   # 方式2
 ```
 
-或者
+它会执行 `env.sh` 中的命令来更改当前 shell 中的环境变量。
 
-```bash
-$ source env.sh
-```
+**Pango安装**
 
-上面的命令会执行 `env.sh` 中的命令来更改当前 shell 中的环境变量。
+下载和解压：
 
-### 安装 Pango
-
-下载后解压：
-
-    $ wget https://download.gnome.org/sources/pango/1.48/pango-1.48.0.tar.xz
-    $ tar -Jxf pango-1.48.0.tar.xz
+    $ wget https://download.gnome.org/sources/pango/1.57/pango-1.57.0.tar.xz
+    $ tar -Jxf pango-1.57.*
 
 可以使用 meson 确定依赖库，然后安装所有依赖库，然后编译安装 Pango：
 
@@ -145,20 +112,16 @@ $ source env.sh
 
     $ export XDG_DATA_DIRS=$HOME/local/share:$XDG_DATA_DIRS
 
-### 安装 Gdk-pixbuf 和 Gtk-doc
+**安装 Gdk-pixbuf**
 
 下载和解压：
 
     $ wget https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-2.42.2.tar.xz
     $ tar -Jxf gdk-pixbuf-2.42.2.tar.xz
-    $ wget https://download.gnome.org/sources/gtk-doc/1.33/gtk-doc-1.33.1.tar.xz
-    $ tar -Jxf gtk-doc-1.33.1.tar.xz
+
 
 和之前一样，安装依赖包，然后编译并安装它们。
 
-Gtk-doc 的安装会将 `gtk-doc.pc` 放在 `$HOME/local/share/pkgconfig` 下。该文件由构建工具之一的 pkg-config 使用。该目录需要添加到环境变量`PKG_CONFIG_PATH`：
-
-    $ export PKG_CONFIG_PATH="$HOME/local/share/pkgconfig:$PKG_CONFIG_PATH"
 
 ### 安装 Gtk4
 
@@ -166,7 +129,7 @@ Gtk-doc 的安装会将 `gtk-doc.pc` 放在 `$HOME/local/share/pkgconfig` 下。
 
     $ git clone https://gitlab.gnome.org/GNOME/gtk.git
 
-如果想要安装最新的稳定版本，那么可以从 [Gnome source website](https://download.gnome.org/sources/gtk/) 下载。目前最新版本是 4.6.3 (2022年5月3日)。
+如果想要安装最新的稳定版本，那么可以从 [Gnome source website](https://download.gnome.org/sources/gtk/) 下载。目前最新版本是 4.21.0 (2025年10月)。
 
 编译安装：
 
@@ -174,7 +137,6 @@ Gtk-doc 的安装会将 `gtk-doc.pc` 放在 `$HOME/local/share/pkgconfig` 下。
     $ ninja -C _build
     $ ninja -C _build install
 
-更多资料请参考 [Gtk4 API Reference, Building GTK](https://docs.gtk.org/gtk4/building.html)。
 
 ### 修改 env.sh
 
@@ -214,106 +176,37 @@ Gtk-doc 的安装会将 `gtk-doc.pc` 放在 `$HOME/local/share/pkgconfig` 下。
 
 要了解如何编译 Gtk4 应用程序，请参阅第 3 节（GtkApplication 和 GtkApplicationWindow）及之后的部分。
 
-## 使用 gnome-boxes 安装 Fedora 34
 
-本节的最后一部分关于 Gnome40 和 gnome-boxes。Gnome 40 是 Gnome 桌面系统的新版本。并且 Gtk4 已经预先安装在发行版中。请先查看 [Gnome 40 网站](https://forty.gnome.org/) 了解更多信息。
+**编译测试**  尝试编译教程中编写的 `tfe` 文本编辑器来测试 Gtk4 开发包是否安装正确。在Linux系统中下载教程仓库，进入目录 `src/tfe7`。编译和运行：
 
-*但是，编译和运行 Gtk4 应用程序不需要 Gnome40。*
+```
+    $ meson _build
+    ... ...
+    Project name: tfe
+    Project version: undefined
+    C compiler for the host machine: cc
+    ... ...
 
-目前有六种选择。
+    $ ninja -C _build
+    ... ...
 
-- Gnome OS
-- Arch Linux
-- Fedora 35
-- openSUSE Tumbleweed
-- Ubuntu 21.10
-- Debian bookworm
+    $ ninja -C _build install
+    ninja: Entering directory `_build'
+    [0/1] Installing files.
+    Installing tfe to /usr/local/bin
+    ... ...
 
-我已经用 gnome-boxes 安装了 Fedora 34。当时我的操作系统是 Ubuntu 21.04。使用 Gnome-boxes 在 Ubuntu 中创建一个虚拟机，然后将 Fedora 将安装到该虚拟机上。
-
-步骤如下：
-
-1. 下载 Fedora 34 iso 文件。[Gnome 40 网站](https://forty.gnome.org/) 末尾有下载链接。
-2. 使用 apt-get 命令安装 gnome-boxes。
-
-        $ sudo apt-get 安装 gnome-boxes
-
-3. 运行 gnome-boxes。
-4. 点击左上角的 `+` 按钮并通过点击 `Create a Virtual Machine ...` 启动创建向导。然后出现一个对话框。单击 `Operationg System Image File` 并选择已下载的 iso 文件。
-5. 然后，执行 Fedora 的安装程序。按照安装程序的说明进行操作。在安装结束时，安装程​​序会指示重新启动系统。单击标题栏右侧的 并选择重新启动或关闭。
-6. 之后回到 gnome-boxes 的初始窗口，窗口的左上角有一个 `Fedora 34 Workstation` 按钮。单击按钮，Fedora 将被执行。
-7. 之后会出现一个设置对话框。根据向导设置 Fedora。
-
-现在您可以使用 Fedora，它已经包含 Gtk4 库，但是需要安装Gtk4开发包。可以使用 `dnf` 安装 `gtk4.x86_64` 包：
-
-    $ sudo dnf install gtk4.x86_64
-
-### Gtk4 编译测试
-
-您可以通过编译基于 Gtk4 的源文件来测试 Gtk4 开发包是否安装正确。例如尝试编译将在第 21 节中编写的 `tfe` 文本编辑器。
-
-1. 打开浏览器
-2. 打开 [Gtk4-Tutorial](https://github.com/ToshioCP/Gtk4-tutorial)
-3. 点击绿色的按钮 `Code`
-4. 选在 `Download ZIP` 以下载源码
-5. 解压下载的文件
-6. 进入目录 `src/tfe7`.
-7. 编译
-
-        $ meson _build
-        bash: meson: command not found...
-        Install package 'meson' to provide command 'meson'? [N/y] y
-
-        * Waiting in queue...
-        The following packages have to be installed:
-        meson-0.56.2-2.fc34.noarch    High productivity build system
-        ninja-build-1.10.2-2.fc34.x86_64    Small build system with a focus on speed
-        vim-filesystem-2:8.2.2787-1.fc34.noarch    VIM filesystem layout
-        Proceed with changes? [N/y] y
-
-        ... ...
-        ... ...
-
-        The Meson build system
-        Version: 0.56.2
-
-        ... ...
-        ... ...
-
-        Project name: tfe
-        Project version: undefined
-        C compiler for the host machine: cc (gcc 11.0.0 "cc (GCC) 11.0.0 20210210 (Red Hat 11.0.0-0)")
-        C linker for the host machine: cc ld.bfd 2.35.1-38
-        Host machine cpu family: x86_64
-        Host machine cpu: x86_64
-        Found pkg-config: /usr/bin/pkg-config (1.7.3)
-        Run-time dependency gtk4 found: YES 4.2.0
-        Found pkg-config: /usr/bin/pkg-config (1.7.3)
-        Program glib-compile-resources found: YES (/usr/bin/glib-compile-resources)
-        Program glib-compile-schemas found: YES (/usr/bin/glib-compile-schemas)
-        Program glib-compile-schemas found: YES (/usr/bin/glib-compile-schemas)
-        Build targets in project: 4
-
-        Found ninja-1.10.2 at /usr/bin/ninja
-
-        $ ninja -C _build
-        ninja: Entering directory `_build'
-        [12/12] Linking target tfe
-
-        $ ninja -C _build install
-        ninja: Entering directory `_build'
-        [0/1] Installing files.
-        Installing tfe to /usr/local/bin
-        Installation failed due to insufficient permissions.
-        Attempting to use polkit to gain elevated privileges...
-        Installing tfe to /usr/local/bin
-        Installing /home/<username>/Gtk4-tutorial-main/src/tfe7/com.github.ToshioCP.tfe.gschema.xml to /usr/local/share/glib-2.0/schemas
-        Running custom install script '/usr/bin/glib-compile-schemas /usr/local/share/glib-2.0/schemas/'
-
-8. 执行
-
-        $ tfe
+    $ tfe # 执行
+```
 
 之后 `tfe` 文本编辑器会显示出来。说明编译和执行已经成功了。
+
+## 怎样下载这个仓库
+
+有两个方法：压缩包和 git。最容易的方法是整体以 `zip` 压缩文件下载下来。不过，如果你用 `git` 工具克隆这个仓库，更新你本地的内容会更方便，用 `git pull` 命令就行。 
+
+## 教程中的案例
+
+程序示例都在仓库的 `src` 目录里。例如，教程的第一个例子是 `pr1.c`，它的路径就是 `src/misc/pr1.c`。所以你不需要自己去手敲代码。
 
 主页：[教程介绍](../README.md)，上一节：[第01节](sec01.md)，下一节：[第03节](sec03.md)
